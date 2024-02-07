@@ -1,5 +1,5 @@
 import os
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = ""
 
 from datasets import load_dataset
 

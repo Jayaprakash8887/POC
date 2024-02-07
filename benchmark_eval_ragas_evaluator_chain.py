@@ -104,7 +104,7 @@ with open('benchmark_results.csv', 'w', encoding='UTF8', newline='') as f:
         print("\nPROMPT:: ", system_rules)
         print("\nUSER QUERY:: ", user_query)
 
-        os.environ["OPENAI_API_KEY"] = "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"
+        os.environ["OPENAI_API_KEY"] = ""
         os.environ["GPT_MODEL"] = "gpt-4"
 
         client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
