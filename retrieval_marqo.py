@@ -18,8 +18,8 @@ def main():
     parser.add_argument("--marqo_url", type=str,
                         help="URL (host:port) where the vectordb is located",
                         default="http://0.0.0.0:8884")
-    parser.add_argument("--index_name", type=int,
-                        help="Port of Vector DB",
+    parser.add_argument("--index_name", type=str,
+                        help="Index or Collection name",
                         default="marqo_teacher_docs_512c_3s")
 
     args = parser.parse_args()
