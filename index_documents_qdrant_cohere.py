@@ -110,7 +110,6 @@ def main():
     CHUNK_SIZE = args.chunk_size
     CHUNK_OVERLAP = args.chunk_overlap
 
-
     # Initialize Marqo instance
     client = QdrantClient(QDRANT_URL, port=6333)
     if FRESH_INDEX:
@@ -149,19 +148,21 @@ def main():
         qdrant_input.append(document.get('text'))
         metadata_list.append(document.get('metadata'))
 
-    _document_batch_size = 500
+    # !!! _document_batch_size cannot be greater than 96 for Cohere !!!
+    _document_batch_size = 50
     computed_docs = 0
     while computed_docs < len(qdrant_input):
-        _document_batch_size = _document_batch_size if (len(qdrant_input)-computed_docs) > _document_batch_size else len(qdrant_input)-computed_docs
+        _document_batch_size = _document_batch_size if (len(qdrant_input) - computed_docs) > _document_batch_size else len(qdrant_input) - computed_docs
 
         data = {
-            "input": qdrant_input[computed_docs:(computed_docs + _document_batch_size)],
-            "model": EMBEDDING_MODEL
+            "texts": qdrant_input[computed_docs:(computed_docs + _document_batch_size)],
+            "model": EMBEDDING_MODEL,
+            "input_type": 'search_document'
         }
 
         response = requests.post(EMBEDDING_API_URL, headers=headers, json=data)
         # print("response:: ", response.json())
-        embeddings = [d["embedding"] for d in response.json()["data"]]
+        embeddings = response.json()["embeddings"]
 
         client.upsert(
             collection_name=QDRANT_INDEX_NAME,
@@ -173,8 +174,8 @@ def main():
         )
         computed_docs += _document_batch_size
         print("computed_docs:: ", computed_docs)
-        # below sleep code is introduced to avoid 429 error from openAI embedding URL call which has 3 RPM limit for free tier openai_api_key
-        time.sleep(20)
+        # below sleep code is introduced to avoid any rate limit issues
+        time.sleep(2)
 
     print("============ INDEX DONE =============", computed_docs)
 
@@ -182,8 +183,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-# RUN below command for OPENAI
-# python3 index_documents_qdrant.py --qdrant_url=http://0.0.0.0:6333 --index_name=sakhi_activity --embedding_model=text-embedding-3-small --embedding_api_url=https://api.openai.com/v1/embeddings --embedding_api_key= --embedding_size=1536 --folder_path=input_data --fresh_index (FOR FRESH INDEXING)
-
-# RUN below command for JINAAI
-# python3 index_documents_qdrant.py --qdrant_url=http://0.0.0.0:6333 --index_name=sakhi_activity --embedding_model=jina-embeddings-v2-base-en --embedding_api_url=https://api.jina.ai/v1/embeddings --embedding_api_key= --embedding_size=768 --folder_path=input_data --fresh_index (FOR FRESH INDEXING)
+# RUN below command for Cohere
+# python3 index_documents_qdrant_cohere.py --qdrant_url=http://0.0.0.0:6333 --index_name={COLLECTION_NAME} --embedding_model=embed-english-v3.0 --embedding_api_url=https://api.cohere.ai/v1/embed --embedding_api_key={COHERE_API_KEY} --embedding_size=1024 --folder_path={FOLDER_PATH_OF_DOCS_TO_INDEX} --fresh_index (FOR FRESH INDEXING)

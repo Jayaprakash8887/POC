@@ -9,6 +9,10 @@ import requests
 from qdrant_client import QdrantClient
 from langchain.docstore.document import Document
 
+EMBED_MODEL = "embed-english-v3.0"
+
+# Get embeddings from the API
+url = "https://api.cohere.ai/v1/embed"
 
 def main():
     parser = argparse.ArgumentParser(description="Q/A using Sakhi documents.")
@@ -21,47 +25,41 @@ def main():
     parser.add_argument("--vector_db_port", type=int,
                         help="Port of Vector DB",
                         default=6333)
-    parser.add_argument('--embeddings_api_key',
+    parser.add_argument('--cohere_api_key',
                         type=str,
                         required=True,
                         help='embedding api key'
                         )
-    parser.add_argument('--embedding_model',
-                        type=str,
-                        required=True,
-                        help='data embedding model to be used.'
-                        )
-    parser.add_argument('--embedding_api_url',
-                        type=str,
-                        required=True,
-                        help='embedding api url'
-                        )
 
     args = parser.parse_args()
-    answer_qdrant = retrieve_qdrant(args)
+    COHERE_API_KEY = args.cohere_api_key
+    query = args.question
+    answer_qdrant = retrieve_qdrant(args, query, COHERE_API_KEY)
     # ai_response = chain.invoke(query)
     # print(ai_response)
 
 
-def retrieve_qdrant(args, EMBED_API_KEY):
-    collection_name = "teacher_docs"
+
+def retrieve_qdrant(args, query, COHERE_API_KEY):
+    collection_name = "cohere_teacher_docs"
     client = QdrantClient(host=args.vector_db_host, port=args.vector_db_port)
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {args.embeddings_api_key}",
+        "Authorization": f"Bearer {COHERE_API_KEY}",
     }
 
     data = {
-        "input": args.question,
-        "model": args.embedding_model,
+        "texts": [query],
+        "model": EMBED_MODEL,
+        "input_type": 'search_query'
     }
 
-    response = requests.post(args.embedding_api_url, headers=headers, json=data)
-    embeddings = [d["embedding"] for d in response.json()["data"]]
+    response = requests.post(url, headers=headers, json=data)
+    embeddings = response.json()["embeddings"]
 
     search_result = client.search(
-        collection_name=collection_name, query_vector=embeddings[0], limit=3
+        collection_name=collection_name, query_vector=embeddings[0], limit=5
     )
 
     print("search_result:: ", search_result)
