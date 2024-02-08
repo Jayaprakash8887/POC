@@ -16,11 +16,11 @@ def main():
                         help="Query to perform Q/A",
                         default="explain FLN Framework")
     parser.add_argument("--marqo_url", type=str,
-                        help="IP Address of host where the vectordb is located",
-                        default="0.0.0.0")
+                        help="URL (host:port) where the vectordb is located",
+                        default="http://0.0.0.0:8884")
     parser.add_argument("--index_name", type=int,
                         help="Port of Vector DB",
-                        default="teacher_docs")
+                        default="marqo_teacher_docs_512c_3s")
 
     args = parser.parse_args()
     answer_qdrant = retrieve_marqo(args)
