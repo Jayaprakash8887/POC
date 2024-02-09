@@ -43,7 +43,7 @@ def main():
     # print(ai_response)
 
 
-def retrieve_qdrant(args, EMBED_API_KEY):
+def retrieve_qdrant(args):
     collection_name = "teacher_docs"
     client = QdrantClient(host=args.vector_db_host, port=args.vector_db_port)
 

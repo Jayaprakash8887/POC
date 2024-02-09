@@ -32,25 +32,23 @@ def main():
                         )
 
     args = parser.parse_args()
-    COHERE_API_KEY = args.cohere_api_key
-    query = args.question
-    answer_qdrant = retrieve_qdrant(args, query, COHERE_API_KEY)
+    answer_qdrant = retrieve_qdrant(args)
     # ai_response = chain.invoke(query)
     # print(ai_response)
 
 
 
-def retrieve_qdrant(args, query, COHERE_API_KEY):
+def retrieve_qdrant(args):
     collection_name = "cohere_teacher_docs"
     client = QdrantClient(host=args.vector_db_host, port=args.vector_db_port)
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {COHERE_API_KEY}",
+        "Authorization": f"Bearer {args.cohere_api_key}",
     }
 
     data = {
-        "texts": [query],
+        "texts": [args.question],
         "model": EMBED_MODEL,
         "input_type": 'search_query'
     }
