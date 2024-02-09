@@ -1,5 +1,4 @@
 import argparse
-import json
 from typing import (
     Any,
     List,
@@ -7,8 +6,8 @@ from typing import (
 )
 
 import requests
-from pymilvus import connections, utility, Collection, FieldSchema, CollectionSchema, DataType, Hit
 from langchain.docstore.document import Document
+from pymilvus import connections, Collection
 
 
 def main():
