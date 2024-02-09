@@ -123,7 +123,7 @@ def main():
 
     fields = [
         FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True, max_length=100),
-        FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=(CHUNK_SIZE+128)),
+        FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=(CHUNK_SIZE+1024)),
         FieldSchema(name="text_vector", dtype=DataType.FLOAT_VECTOR, dim=EMBEDDING_SIZE),
         FieldSchema(name="metadata", dtype=DataType.JSON),
     ]
