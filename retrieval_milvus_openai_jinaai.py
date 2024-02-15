@@ -85,10 +85,10 @@ def retrieve(args):
         documents.append(tpl)
 
     top_docs_to_fetch = 5
-    min_score = 0.5
+    max_score = 0.5
     print(f"\n\ndocuments : {str(documents)}")
 
-    filtered_document = get_score_filtered_documents(documents, float(min_score))
+    filtered_document = get_score_filtered_documents(documents, float(max_score))
     print(f"\n\nScore filtered documents : {str(filtered_document)}")
     filtered_document = filtered_document[:int(top_docs_to_fetch)]
     print(f"\n\nTop documents : {str(filtered_document)}")
@@ -96,8 +96,8 @@ def retrieve(args):
     print("\n\ncontexts:: ", contexts)
 
 
-def get_score_filtered_documents(documents: List[Tuple[Document, Any]], min_score=0.0):
-    return [(document, search_score) for document, search_score in documents if search_score > min_score]
+def get_score_filtered_documents(documents: List[Tuple[Document, Any]], max_score=0.0):
+    return [(document, search_score) for document, search_score in documents if search_score < max_score]
 
 
 def get_formatted_documents(documents: List[Tuple[Document, Any]]):

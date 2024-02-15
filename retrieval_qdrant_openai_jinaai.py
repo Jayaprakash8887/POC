@@ -44,7 +44,7 @@ def main():
 
 
 def retrieve_qdrant(args):
-    collection_name = "teacher_docs"
+    collection_name = "open_teacher_docs"
     client = QdrantClient(host=args.vector_db_host, port=args.vector_db_port)
 
     headers = {
@@ -77,7 +77,7 @@ def retrieve_qdrant(args):
         documents.append(tpl)
 
     top_docs_to_fetch = 5
-    min_score = 0.7
+    min_score = 0.5
     print(f"\n\ndocuments : {str(documents)}")
 
     filtered_document = get_score_filtered_documents(documents, float(min_score))
